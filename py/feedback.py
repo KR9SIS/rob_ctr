@@ -8,6 +8,7 @@ FeedbackData = np.dtype(
         ),
         ("reserved1", np.int16, (3,)),
         #
+        #
         (
             "digital_input_bits",
             np.int32,
@@ -25,6 +26,7 @@ FeedbackData = np.dtype(
             np.int32,
         ),
         #
+        #
         (
             "run_time",  # reserved2
             np.int32,
@@ -37,6 +39,7 @@ FeedbackData = np.dtype(
             "safety_mode",  # reserved3
             np.float64,
         ),
+        #
         #
         (
             "speed_scaling",
@@ -59,6 +62,7 @@ FeedbackData = np.dtype(
             np.float64,
         ),
         #
+        #
         (
             "program_state",  # reserved4
             np.float64,
@@ -68,9 +72,11 @@ FeedbackData = np.dtype(
             np.float64,
         ),
         #
+        #
         ("tool_accelerometer_values", np.float64, (3,)),
         ("elbow_position", np.float64, (3,)),
         ("elbow_velocity", np.float64, (3,)),
+        #
         #
         ("q_target", np.float64, (6,)),
         ("qd_target", np.float64, (6,)),
@@ -90,51 +96,146 @@ FeedbackData = np.dtype(
         ("joint_modes", np.float64, (6,)),
         ("v_actual", np.float64, (6,)),
         #
-        ("hand_type", np.uint8, (4,)),
-        ("user_coordinate", np.uint8, (1,)),
-        ("tool_coordinate", np.uint8, (1,)),
-        ("is_run_queued_cmd", np.uint8, (1,)),
-        ("is_pause_cmd_flag", np.uint8, (1,)),
-        ("velocity_ratio", np.uint8, (1,)),
-        ("acceleration_ratio", np.uint8, (1,)),
-        ("jerk_ratio", np.uint8, (1,)),
-        ("xyz_velocity_ratio", np.uint8, (1,)),
-        ("r_velocity_ratio", np.uint8, (1,)),
-        ("xyz_acceleration_ratio", np.uint8, (1,)),
-        ("r_acceleration_ratio", np.uint8, (1,)),
-        ("xyz_jerk_ratio", np.uint8, (1,)),
-        ("r_jerk_ratio", np.uint8, (1,)),
         #
-        ("brake_status", np.uint8, (1,)),
-        ("enable_status", np.uint8, (1,)),
-        ("drag_status", np.uint8, (1,)),
-        ("running_status", np.uint8, (1,)),
-        ("error_status", np.uint8, (1,)),
-        ("jog_status", np.uint8, (1,)),
-        ("robot_type", np.uint8, (1,)),
-        ("drag_button_signal", np.uint8, (1,)),
-        ("enable_button_signal", np.uint8, (1,)),
-        ("record_button_signal", np.uint8, (1,)),
-        ("reappear_button_signal", np.uint8, (1,)),
-        ("jaw_button_signal", np.uint8, (1,)),
-        ("six_force_online", np.uint8, (1,)),  # 1037
+        ("hand_type", np.uint8, (4,)),
+        (
+            "user_coordinate",
+            np.uint8,
+        ),
+        (
+            "tool_coordinate",
+            np.uint8,
+        ),
+        (
+            "is_run_queued_cmd",
+            np.uint8,
+        ),
+        (
+            "is_pause_cmd_flag",
+            np.uint8,
+        ),
+        (
+            "velocity_ratio",
+            np.uint8,
+        ),
+        (
+            "acceleration_ratio",
+            np.uint8,
+        ),
+        (
+            "jerk_ratio",
+            np.uint8,
+        ),
+        (
+            "xyz_velocity_ratio",
+            np.uint8,
+        ),
+        (
+            "r_velocity_ratio",
+            np.uint8,
+        ),
+        (
+            "xyz_acceleration_ratio",
+            np.uint8,
+        ),
+        (
+            "r_acceleration_ratio",
+            np.uint8,
+        ),
+        (
+            "xyz_jerk_ratio",
+            np.uint8,
+        ),
+        (
+            "r_jerk_ratio",
+            np.uint8,
+        ),
+        #
+        #
+        (
+            "brake_status",
+            np.uint8,
+        ),
+        (
+            "enable_status",
+            np.uint8,
+        ),
+        (
+            "drag_status",
+            np.uint8,
+        ),
+        (
+            "running_status",
+            np.uint8,
+        ),
+        (
+            "error_status",
+            np.uint8,
+        ),
+        (
+            "jog_status",
+            np.uint8,
+        ),
+        (
+            "robot_type",
+            np.uint8,
+        ),
+        (
+            "drag_button_signal",
+            np.uint8,
+        ),
+        (
+            "enable_button_signal",
+            np.uint8,
+        ),
+        (
+            "record_button_signal",
+            np.uint8,
+        ),
+        (
+            "reappear_button_signal",
+            np.uint8,
+        ),
+        (
+            "jaw_button_signal",
+            np.uint8,
+        ),
+        (
+            "six_force_online",
+            np.uint8,
+        ),  # 1037
+        #
         #
         ("reserved6", np.uint8, (82,)),
         #
-        ("m_actual[6]", np.float64, (6,)),
-        ("load", np.float64, (1,)),
-        ("centerX", np.float64, (1,)),
-        ("centerY", np.float64, (1,)),
-        ("centerZ", np.float64, (1,)),
+        #
+        ("m_actual[6]", np.float64, (6,)),  # Actual torque
+        (
+            "load",
+            np.float64,
+        ),  # Load weight in kg
+        (
+            "centerX",
+            np.float64,
+        ),
+        (
+            "centerY",
+            np.float64,
+        ),
+        (
+            "centerZ",
+            np.float64,
+        ),
         ("user", np.float64, (6,)),
         ("tool", np.float64, (6,)),
         (
             "traceIndex",
-            np.int64,
+            np.float64,
         ),
-        ("six_force_value", np.int64, (6,)),
+        ("six_force_value", np.float64, (6,)),
         ("target_quaternion", np.float64, (4,)),
         ("actual_quaternion", np.float64, (4,)),
+        #
         #
         ("reserved7", np.uint8, (24,)),
     ]
