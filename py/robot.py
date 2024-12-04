@@ -1,5 +1,7 @@
-import pickle
 import socket
+
+from feedback import FeedbackData
+from numpy import frombuffer
 
 
 class RobotConn:
@@ -37,5 +39,4 @@ class RobotFeedbackConn:
 
     def receive_feedback(self):
         buffer = self.feedback_conn.recv(1440)
-        feedback_data = pickle.loads(buffer)
-        return feedback_data
+        return frombuffer(buffer, dtype=FeedbackData)
