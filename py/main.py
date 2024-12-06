@@ -4,6 +4,9 @@ from robot import RobotConn, RobotFeedbackConn
 
 
 def parse_args():
+    """
+    Argument parser called by the main function
+    """
     parser = argparse.ArgumentParser(description="Cli to control dobot robot")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -24,16 +27,28 @@ def parse_args():
 
     subparsers.add_parser("move_loop", help="Continously move the robot")
 
+    subparsers.add_parser("feed_loop", help="Continously get feedback from the robot")
+
     return parser.parse_args()
 
 
 def get_feedback():
+    """
+    Gets feedback from MG400 off port 3004 and prints it to std out.
+    """
     rfc = RobotFeedbackConn.connect()
     feedback = rfc.receive_feedback()
     rfc.print_feedback(feedback)
 
 
 def move_loop(robot):
+    """
+    GUI interface to repeatedly move the arm or access feedback from it.
+    :params robot RobotConn
+    Asks for four input coordinates to move the arm to.
+    If it get's less than that then it fills in with the previous coordinates given.
+    Default coordinates are x: 270 and y, z and r: 0
+    """
     robot.enable_robot()
     on = True
     x = 270
@@ -84,6 +99,16 @@ def move_loop(robot):
 
 
 def main():
+    """
+    Main function to operate the dobot arm
+    Call the function with one of the following arguments
+    'on' to enable the robot
+    'off' to disable the robot
+    'move' after enabling to move the robot once
+    'do' to set status of digital output port
+    'feedback' to get the current feedback about the arm from port 2004
+    'move_loop' to activate multiple movements and feedback from the arm
+    """
     args = parse_args()
     robot = RobotConn.connect()
 
@@ -100,6 +125,9 @@ def main():
             get_feedback()
         case "move_loop":
             move_loop(robot)
+        case "feed_loop":
+            while True:  # Feedback will continue to print until ctr + c is pressed
+                get_feedback()
 
 
 if __name__ == "__main__":
