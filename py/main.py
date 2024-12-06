@@ -22,25 +22,84 @@ def parse_args():
 
     subparsers.add_parser("feedback", help="Get feedback from the robot")
 
+    subparsers.add_parser("move_loop", help="Continously move the robot")
+
     return parser.parse_args()
+
+
+def get_feedback():
+    rfc = RobotFeedbackConn.connect()
+    feedback = rfc.receive_feedback()
+    rfc.print_feedback(feedback)
+
+
+def move_loop(robot):
+    robot.enable_robot()
+    on = True
+    x = 270
+    y = z = r = 0
+    coords: list = [x, y, z, r]
+    while on:
+        cmd = input(
+            "\nPlease input 'x y z r' coordinates\nor 'f' for feedback\nor 'q' to quit\nCommand: "
+        ).lower()
+        if cmd not in ("q", "f"):
+            coords = cmd.split()
+            if "x" in coords:
+                coords[0] = x
+            if "y" in coords:
+                coords[1] = y
+            if "z" in coords:
+                coords[2] = z
+            if "r" in coords:
+                coords[3] = r
+
+            coords = list(map(int, coords))
+            cmd_num = len(coords)
+            if cmd_num > 4:
+                coords = coords[0:4]
+                x, y, z, r = coords
+
+            elif cmd_num < 4:
+                match cmd_num:
+                    case 0:
+                        pass  # Use previous coordinates
+                    case 1:
+                        x = coords[0]
+                    case 2:
+                        x, y = coords[0:2]
+                    case 3:
+                        x, y, z = coords[0:3]
+            else:
+                x, y, z, r = coords
+
+            print(f"x: {x}, y: {y}, z: {z}, r: {r}")
+            # robot.mov_j(x, y, z, r)
+        elif cmd == "f":
+            get_feedback()
+        elif cmd == "q":
+            on = False
+
+    robot.disable_robot()
 
 
 def main():
     args = parse_args()
     robot = RobotConn.connect()
 
-    if args.command == "on":
-        robot.enable_robot()
-    elif args.command == "off":
-        robot.disable_robot()
-    elif args.command == "move":
-        robot.mov_j(args.x, args.y, args.z, args.r)
-    elif args.command == "do":
-        robot.set_do(args.index, args.status)
-    elif args.command == "feedback":
-        rfc = RobotFeedbackConn.connect()
-        feedback = rfc.receive_feedback()
-        rfc.print_feedback(feedback)
+    match args.command:
+        case "on":
+            robot.enable_robot()
+        case "off":
+            robot.disable_robot()
+        case "move":
+            robot.mov_j(args.x, args.y, args.z, args.r)
+        case "do":
+            robot.set_do(args.index, args.status)
+        case "feedback":
+            get_feedback()
+        case "move_loop":
+            move_loop(robot)
 
 
 if __name__ == "__main__":
