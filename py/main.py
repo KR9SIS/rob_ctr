@@ -38,8 +38,9 @@ def main():
     elif args.command == "do":
         robot.set_do(args.index, args.status)
     elif args.command == "feedback":
-        feedback = RobotFeedbackConn.connect().receive_feedback()
-        print(feedback)
+        rfc = RobotFeedbackConn.connect()
+        feedback = rfc.receive_feedback()
+        rfc.print_feedback(feedback)
 
 
 if __name__ == "__main__":

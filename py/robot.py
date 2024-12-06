@@ -1,6 +1,6 @@
 import socket
 
-from feedback import FeedbackData
+from feedback import FeedbackData, feedback_data_arr
 from numpy import frombuffer
 
 
@@ -39,4 +39,8 @@ class RobotFeedbackConn:
 
     def receive_feedback(self):
         buffer = self.feedback_conn.recv(1440)
-        return frombuffer(buffer, dtype=FeedbackData)
+        return frombuffer(buffer, dtype=FeedbackData)[0]
+
+    def print_feedback(self, feedback):
+        print("Arm Coordinates", feedback[31][0:4])
+        _ = [print(header, data) for header, data in zip(feedback_data_arr, feedback)]
