@@ -19,7 +19,7 @@ def parse_args():
     move_parser.add_argument("z", type=float, help="Z coordinate")
     move_parser.add_argument("r", type=float, help="R coordinate")
 
-    do_parser = subparsers.add_parser("do", help="Set DO")
+    do_parser = subparsers.add_parser("do", help="Set Digital Output")
     do_parser.add_argument("index", type=int, help="Index")
     do_parser.add_argument("status", type=int, help="Status")
 
@@ -34,7 +34,7 @@ def parse_args():
 
 def get_rob_status():
     """
-    Gets feedback from MG400 off port 3004 and prints it to std out.
+    Gets feedback from MG400 off port 30004 and prints it to std out.
     """
     rfc = RobotStatusConn.connect()
     status = rfc.receive_rob_status()
@@ -112,7 +112,7 @@ def main():
     'off' to disable the robot
     'move' after enabling to move the robot once
     'do' to set status of digital output port
-    'status' to get the current status about the arm from port 3004
+    'status' to get the current status about the arm from port 30004
     'move_loop' to activate multiple movements and feedback from the arm
     """
     args = parse_args()
