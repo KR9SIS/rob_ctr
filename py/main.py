@@ -69,29 +69,33 @@ def move_loop(robot):
             if "r" in coords:
                 coords[3] = r
 
-            coords = list(map(int, coords))
-            cmd_num = len(coords)
-            if cmd_num > 4:
-                coords = coords[0:4]
-                x, y, z, r = coords
+            try:
+                coords = list(map(int, coords))
 
-            elif cmd_num < 4:
-                match cmd_num:
-                    case 0:
-                        pass  # Use previous coordinates
-                    case 1:
-                        x = coords[0]
-                    case 2:
-                        x, y = coords[0:2]
-                    case 3:
-                        x, y, z = coords[0:3]
-            else:
-                x, y, z, r = coords
+                cmd_num = len(coords)
+                if cmd_num > 4:
+                    coords = coords[0:4]
+                    x, y, z, r = coords
 
-            print(f"x: {x}, y: {y}, z: {z}, r: {r}")
-            # robot.mov_j(x, y, z, r)
-        elif cmd == "f":
-            get_feedback()
+                elif cmd_num < 4:
+                    match cmd_num:
+                        case 0:
+                            pass  # Use previous coordinates
+                        case 1:
+                            x = coords[0]
+                        case 2:
+                            x, y = coords[0:2]
+                        case 3:
+                            x, y, z = coords[0:3]
+                else:
+                    x, y, z, r = coords
+
+                print(f"x: {x}, y: {y}, z: {z}, r: {r}")
+                robot.mov_j(x, y, z, r)
+
+            except ValueError:
+                print("Please only input alphanumeric characters")
+
         elif cmd == "s":
             get_rob_status()
         elif cmd == "q":
