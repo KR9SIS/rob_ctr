@@ -15,14 +15,9 @@ class RobotConn:
         self,
         dashboard_cmd_stream,
         motion_cmd_stream,
-        dash_serv_stream,
-        motion_serv_stream,
     ):
         self.dashboard_cmd_stream = dashboard_cmd_stream
-        self.dash_serv_stream = dash_serv_stream
         self.motion_cmd_stream = motion_cmd_stream
-        self.motion_serv_stream = motion_serv_stream
-        self.thread_lock = Lock()
 
     @classmethod
     def connect(cls):
@@ -34,48 +29,49 @@ class RobotConn:
         :return RobotConn object with active connection to the two ports
         """
         dashboard_conn = socket.create_connection(("192.168.1.6", 29999))
-        dash_serv_conn = Thread(
-            target=cls.__setup_server, args=(dashboard_conn,), daemon=True
-        )
         motion_conn = socket.create_connection(("192.168.1.6", 30003))
-        motion_serv_conn = Thread(
-            target=cls.__setup_server, args=(motion_conn,), daemon=True
-        )
 
-        return cls(dashboard_conn, motion_conn, dash_serv_conn, motion_serv_conn)
+        return cls(dashboard_conn, motion_conn)
 
-    def __s_print(self, *a, **b):
-        with self.thread_lock:
-            print(*a, **b)
-
-    def __setup_server(self, conn):
-        while True:
-            data = conn.recv(64).decode("utf-8")
-            self.__s_print(data)
+    def __read_response(self, conn):
+        """
+        Read the response from the robot after sending a command.
+        """
+        try:
+            response = conn.recv(1024).decode("utf-8")
+            print("\nRobot response:\n", response)
+            return response
+        except socket.error as e:
+            print("Error reading response:", e)
+            return None
 
     def enable_robot(self):
         """
         Function calling port 29999 to enable robot
         """
         self.dashboard_cmd_stream.sendall(b"EnableRobot()\n")
+        self.__read_response(self.dashboard_cmd_stream)
 
     def disable_robot(self):
         """
         Function calling port 29999 to disable robot
         """
         self.dashboard_cmd_stream.sendall(b"DisableRobot()\n")
+        self.__read_response(self.dashboard_cmd_stream)
 
     def set_do(self, index, status):
         """
         Function calling port 2999 to change Digital Output stream
         """
         self.dashboard_cmd_stream.sendall(f"DO({index}, {status})\n".encode())
+        self.__read_response(self.dashboard_cmd_stream)
 
     def mov_j(self, x, y, z, r):
         """
         Function calling port 30003
         """
         self.motion_cmd_stream.sendall(f"MovJ({x}, {y}, {z}, {r})\n".encode())
+        self.__read_response(self.motion_cmd_stream)
 
 
 class RobotStatusConn:
