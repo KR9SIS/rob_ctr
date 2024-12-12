@@ -1,17 +1,28 @@
 import socket
+from threading import Lock, Thread
 
 from numpy import frombuffer
 
 from rob_status import RobStatusData, status_data_arr
+
 
 class RobotConn:
     """
     Active connection to the robot which acts as an interface for it.
     """
 
-    def __init__(self, dashboard_cmd_stream, motion_cmd_stream):
+    def __init__(
+        self,
+        dashboard_cmd_stream,
+        motion_cmd_stream,
+        dash_serv_stream,
+        motion_serv_stream,
+    ):
         self.dashboard_cmd_stream = dashboard_cmd_stream
+        self.dash_serv_stream = dash_serv_stream
         self.motion_cmd_stream = motion_cmd_stream
+        self.motion_serv_stream = motion_serv_stream
+        self.thread_lock = Lock()
 
     @classmethod
     def connect(cls):
@@ -23,8 +34,24 @@ class RobotConn:
         :return RobotConn object with active connection to the two ports
         """
         dashboard_conn = socket.create_connection(("192.168.1.6", 29999))
+        dash_serv_conn = Thread(
+            target=cls.__setup_server, args=(dashboard_conn,), daemon=True
+        )
         motion_conn = socket.create_connection(("192.168.1.6", 30003))
-        return cls(dashboard_conn, motion_conn)
+        motion_serv_conn = Thread(
+            target=cls.__setup_server, args=(motion_conn,), daemon=True
+        )
+
+        return cls(dashboard_conn, motion_conn, dash_serv_conn, motion_serv_conn)
+
+    def __s_print(self, *a, **b):
+        with self.thread_lock:
+            print(*a, **b)
+
+    def __setup_server(self, conn):
+        while True:
+            data = conn.recv(64).decode("utf-8")
+            self.__s_print(data)
 
     def enable_robot(self):
         """
