@@ -1,6 +1,6 @@
 import argparse
 
-from robot import RobotConn, RobotFeedbackConn
+from robot import RobotConn, RobotStatusConn
 
 
 def parse_args():
@@ -23,7 +23,7 @@ def parse_args():
     do_parser.add_argument("index", type=int, help="Index")
     do_parser.add_argument("status", type=int, help="Status")
 
-    subparsers.add_parser("feedback", help="Get feedback from the robot")
+    subparsers.add_parser("status", help="Get robot status")
 
     subparsers.add_parser("move_loop", help="Continously move the robot")
 
@@ -32,13 +32,13 @@ def parse_args():
     return parser.parse_args()
 
 
-def get_feedback():
+def get_rob_status():
     """
     Gets feedback from MG400 off port 3004 and prints it to std out.
     """
-    rfc = RobotFeedbackConn.connect()
-    feedback = rfc.receive_feedback()
-    rfc.print_feedback(feedback)
+    rfc = RobotStatusConn.connect()
+    status = rfc.receive_rob_status()
+    rfc.print_status(status)
 
 
 def move_loop(robot):
@@ -56,9 +56,9 @@ def move_loop(robot):
     coords: list = [x, y, z, r]
     while on:
         cmd = input(
-            "\nPlease input 'x y z r' coordinates\nor 'f' for feedback\nor 'q' to quit\nCommand: "
+            "\nPlease input 'x y z r' coordinates\nor 's' for status\nor 'q' to quit\nCommand: "
         ).lower()
-        if cmd not in ("q", "f"):
+        if cmd not in ("q", "s"):
             coords = cmd.split()
             if "x" in coords:
                 coords[0] = x
@@ -92,6 +92,8 @@ def move_loop(robot):
             # robot.mov_j(x, y, z, r)
         elif cmd == "f":
             get_feedback()
+        elif cmd == "s":
+            get_rob_status()
         elif cmd == "q":
             on = False
 
@@ -106,7 +108,7 @@ def main():
     'off' to disable the robot
     'move' after enabling to move the robot once
     'do' to set status of digital output port
-    'feedback' to get the current feedback about the arm from port 2004
+    'status' to get the current status about the arm from port 3004
     'move_loop' to activate multiple movements and feedback from the arm
     """
     args = parse_args()
@@ -121,13 +123,10 @@ def main():
             robot.mov_j(args.x, args.y, args.z, args.r)
         case "do":
             robot.set_do(args.index, args.status)
-        case "feedback":
-            get_feedback()
+        case "status":
+            get_rob_status()
         case "move_loop":
             move_loop(robot)
-        case "feed_loop":
-            while True:  # Feedback will continue to print until ctr + c is pressed
-                get_feedback()
 
 
 if __name__ == "__main__":

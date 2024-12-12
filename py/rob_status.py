@@ -1,6 +1,6 @@
 import numpy as np
 
-FeedbackData = np.dtype(
+RobStatusData = np.dtype(
     [
         # Meaning, Data type, Number of values
         ("msg_len", np.ushort, (1,)),
@@ -105,7 +105,7 @@ FeedbackData = np.dtype(
     ]
 )
 
-feedback_data_arr = [
+status_data_arr = [
     "msg_len",
     "reserved1",
     "digital_input_bits",
@@ -185,5 +185,5 @@ feedback_data_arr = [
 ]
 
 if __name__ == "__main__":
-    print(FeedbackData.itemsize)  # Should be 1440
-    print(FeedbackData)
+    print(RobStatusData.itemsize)  # Should be 1440
+    print(RobStatusData)

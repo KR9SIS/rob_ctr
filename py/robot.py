@@ -1,8 +1,8 @@
 import socket
 
-from feedback import FeedbackData, feedback_data_arr
 from numpy import frombuffer
 
+from rob_status import RobStatusData, status_data_arr
 
 class RobotConn:
     """
@@ -51,12 +51,13 @@ class RobotConn:
         self.motion_cmd_stream.sendall(f"MovJ({x}, {y}, {z}, {r})\n".encode())
 
 
-class RobotFeedbackConn:
+class RobotStatusConn:
     """
     Class to return the current status of the robot
     """
-    def __init__(self, feedback_conn):
-        self.feedback_conn = feedback_conn
+
+    def __init__(self, status_conn):
+        self.status_conn = status_conn
 
     @classmethod
     def connect(cls):
@@ -66,13 +67,16 @@ class RobotFeedbackConn:
         feedback_conn = socket.create_connection(("192.168.1.6", 30004))
         return cls(feedback_conn)
 
-    def receive_feedback(self):
-        buffer = self.feedback_conn.recv(1440)
-        return frombuffer(buffer, dtype=FeedbackData)[0]
+    def receive_rob_status(self):
+        """
+        Use RobStatusData type to map robot status to stdout
+        """
+        buffer = self.status_conn.recv(1440)
+        return frombuffer(buffer, dtype=RobStatusData)[0]
 
-    def print_feedback(self, feedback):
+    def print_status(self, status):
         """
         Print out all data from Robot Status with its header
         """
-        print("Arm Coordinates", feedback[31][0:4])
-        _ = [print(header, data) for header, data in zip(feedback_data_arr, feedback)]
+        print("Arm Coordinates", status[31][0:4])
+        _ = [print(header, data) for header, data in zip(status_data_arr, status)]
