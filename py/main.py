@@ -9,7 +9,8 @@ def parse_args():
     Argument parser called by the main function
     """
     parser = argparse.ArgumentParser(description="Cli to control dobot robot")
-    subparsers = parser.add_subparsers(dest="command", required=True)
+    subparsers = parser.add_subparsers(dest="command")
+    subparsers.default = "move_loop"
 
     subparsers.add_parser("on", help="Turn on the robot")
     subparsers.add_parser("off", help="Turn off the robot")
