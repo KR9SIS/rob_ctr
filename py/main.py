@@ -56,9 +56,9 @@ def move_loop(robot):
     coords: list = [x, y, z, r]
     while on:
         cmd = input(
-            "\nPlease input 'x y z r' coordinates\nor 's' for status\nor 'q' to quit\nCommand: "
+            "\nPlease input 'x y z r' coordinates\nor 's' for status\nor 'ce' to clear error\nor 'q' to quit\nCommand: "
         ).lower()
-        if cmd not in ("q", "s"):
+        if cmd not in ("q", "s", "ce"):
             coords = cmd.split()
             if "x" in coords:
                 coords[0] = x
@@ -94,10 +94,14 @@ def move_loop(robot):
                 robot.mov_j(x, y, z, r)
 
             except ValueError:
-                print("Please only input alphanumeric characters")
+                print(
+                    "Only input numbers or the characters:\n'x', 'y', 'z', 'r', 's', 'ce', or 'q'"
+                )
 
         elif cmd == "s":
             get_rob_status()
+        elif cmd == "ce":
+            robot.clear_error()
         elif cmd == "q":
             on = False
 

@@ -1,5 +1,4 @@
 import socket
-from threading import Lock, Thread
 
 from numpy import frombuffer
 
@@ -65,6 +64,15 @@ class RobotConn:
         """
         self.dashboard_cmd_stream.sendall(f"DO({index}, {status})\n".encode())
         self.__read_response(self.dashboard_cmd_stream)
+
+    def clear_error(self):
+        """
+        Function to clear an error and reset the robot
+        """
+        self.dashboard_cmd_stream("ClearError()".encode())
+        self.__read_response(self.dashboard_cmd_stream)
+        self.disable_robot()
+        self.enable_robot()
 
     def mov_j(self, x, y, z, r):
         """
