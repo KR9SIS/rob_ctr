@@ -70,7 +70,6 @@ def move_loop(robot):
         return (False, True)
 
     def parse_coords(coords, x, y, z, r):
-
         if "x" in coords:
             coords[0] = x
         if "y" in coords:
@@ -102,7 +101,7 @@ def move_loop(robot):
             else:
                 x, y, z, r = coords
 
-            # print(f"x: {x}, y: {y}, z: {z}, r: {r}")
+            print(f"x: {x}, y: {y}, z: {z}, r: {r}")
             robot.mov_j(x, y, z, r)
             return (x, y, z, r)
 
