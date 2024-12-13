@@ -1,4 +1,6 @@
 import socket
+from threading import Lock, Thread
+from time import sleep
 
 from numpy import frombuffer
 
@@ -15,8 +17,23 @@ class RobotConn:
         dashboard_cmd_stream,
         motion_cmd_stream,
     ):
+        self.thread_lock = Lock()
+
         self.dashboard_cmd_stream = dashboard_cmd_stream
+        self.dashboard_feed_thread = Thread(
+            target=self.__rob_feed_server,
+            args=(self.dashboard_cmd_stream,),
+            daemon=True,
+        )
+        self.dashboard_feed_thread.start()
+
         self.motion_cmd_stream = motion_cmd_stream
+        self.motion_feed_thread = Thread(
+            target=self.__rob_feed_server,
+            args=(self.motion_cmd_stream,),
+            daemon=True,
+        )
+        self.motion_feed_thread.start()
 
     @classmethod
     def connect(cls):
@@ -32,54 +49,53 @@ class RobotConn:
 
         return cls(dashboard_conn, motion_conn)
 
-    def __read_response(self, conn):
+    def __rob_feed_server(self, conn):
         """
         Read the response from the robot after sending a command.
         """
-        try:
-            response = conn.recv(1024).decode("utf-8")
-            print("\nRobot response:\n", response)
-            return response
-        except socket.error as e:
-            print("Error reading response:", e)
-            return None
+        while True:
+            try:
+                response = conn.recv(1024).decode("utf-8")
+                with self.thread_lock:
+                    print("Robot response:\n", response)
+                return response
+            except socket.error as e:
+                with self.thread_lock:
+                    print("Error reading response:", e)
+                return None
 
     def enable_robot(self):
         """
         Function calling port 29999 to enable robot
         """
         self.dashboard_cmd_stream.sendall(b"EnableRobot()\n")
-        self.__read_response(self.dashboard_cmd_stream)
+        sleep(1)
 
     def disable_robot(self):
         """
         Function calling port 29999 to disable robot
         """
         self.dashboard_cmd_stream.sendall(b"DisableRobot()\n")
-        self.__read_response(self.dashboard_cmd_stream)
+        sleep(1)
 
     def set_do(self, index, status):
         """
         Function calling port 2999 to change Digital Output stream
         """
         self.dashboard_cmd_stream.sendall(f"DO({index}, {status})\n".encode())
-        self.__read_response(self.dashboard_cmd_stream)
 
     def clear_error(self):
         """
-        Function to clear an error and reset the robot
+        Function to clear an error and reset the robot.
         """
-        self.dashboard_cmd_stream("ClearError()".encode())
-        self.__read_response(self.dashboard_cmd_stream)
-        self.disable_robot()
-        self.enable_robot()
+        self.dashboard_cmd_stream.sendall("ClearError()".encode())
+        self.dashboard_cmd_stream.sendall("Continue()".encode())
 
     def mov_j(self, x, y, z, r):
         """
         Function calling port 30003
         """
         self.motion_cmd_stream.sendall(f"MovJ({x}, {y}, {z}, {r})\n".encode())
-        self.__read_response(self.motion_cmd_stream)
 
 
 class RobotStatusConn:

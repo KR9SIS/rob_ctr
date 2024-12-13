@@ -1,4 +1,5 @@
 import argparse
+from time import sleep
 
 from robot import RobotConn, RobotStatusConn
 
@@ -55,9 +56,11 @@ def move_loop(robot):
     y = z = r = 0
     coords: list = [x, y, z, r]
     while on:
+        sleep(0.1)
         cmd = input(
             "\nPlease input 'x y z r' coordinates\nor 's' for status\nor 'ce' to clear error\nor 'q' to quit\nCommand: "
         ).lower()
+        print()
         if cmd not in ("q", "s", "ce"):
             coords = cmd.split()
             if "x" in coords:
@@ -72,15 +75,16 @@ def move_loop(robot):
             try:
                 coords = list(map(int, coords))
 
-                cmd_num = len(coords)
-                if cmd_num > 4:
+                coord_num = len(coords)
+                if coord_num > 4:
                     coords = coords[0:4]
                     x, y, z, r = coords
 
-                elif cmd_num < 4:
-                    match cmd_num:
+                elif coord_num < 4:
+                    match coord_num:
                         case 0:
-                            pass  # Use previous coordinates
+                            print("No coordinates, staying in place")
+                            continue
                         case 1:
                             x = coords[0]
                         case 2:
@@ -99,7 +103,8 @@ def move_loop(robot):
                 )
 
         elif cmd == "s":
-            get_rob_status()
+            with robot.thread_lock:
+                get_rob_status()
         elif cmd == "ce":
             robot.clear_error()
         elif cmd == "q":
@@ -132,7 +137,8 @@ def main():
         case "do":
             robot.set_do(args.index, args.status)
         case "status":
-            get_rob_status()
+            with robot.thread_lock:
+                get_rob_status()
         case "move_loop":
             move_loop(robot)
 
