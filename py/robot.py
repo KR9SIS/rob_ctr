@@ -58,11 +58,11 @@ class RobotConn:
                 response = conn.recv(1024).decode("utf-8")
                 with self.thread_lock:
                     print("Robot response:\n", response)
-                return response
+                sleep(1)
             except socket.error as e:
                 with self.thread_lock:
                     print("Error reading response:", e)
-                return None
+                sleep(1)
 
     def enable_robot(self):
         """

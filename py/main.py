@@ -117,7 +117,7 @@ def move_loop(robot):
     x = 270
     y = z = r = 0
     while on:
-        sleep(0.1)
+        sleep(0.2)
         with robot.thread_lock:
             cmd = input(
                 "\nPlease input 'x y z r' coordinates\nor 's' for status\nor 'ce' to clear error\nor 'q' to quit\nCommand: "
@@ -128,7 +128,7 @@ def move_loop(robot):
         if not continue_loop:
             on = False
         elif not matched:
-            parse_coords(cmd.split(), x, y, z, r)
+            x, y, z, r = parse_coords(cmd.split(), x, y, z, r)
 
     robot.disable_robot()
 
