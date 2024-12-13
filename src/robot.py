@@ -10,16 +10,21 @@ from rob_status import RobStatusData, status_data_arr
 class RobotConn:
     """
     Active connection to the robot which acts as an interface for it.
+    Raises TimeoutError if connection cannot be made
     """
 
     def __init__(
         self,
-        dashboard_cmd_stream,
-        motion_cmd_stream,
     ):
         self.thread_lock = Lock()
+        streams = []
+        connect_thread = Thread(target=self.__connect, args=(streams,), daemon=True)
+        connect_thread.start()
+        connect_thread.join(timeout=5)
+        if connect_thread.is_alive():
+            raise TimeoutError
 
-        self.dashboard_cmd_stream = dashboard_cmd_stream
+        self.dashboard_cmd_stream = streams[0]
         self.dashboard_feed_thread = Thread(
             target=self.__rob_feed_server,
             args=(self.dashboard_cmd_stream,),
@@ -27,7 +32,7 @@ class RobotConn:
         )
         self.dashboard_feed_thread.start()
 
-        self.motion_cmd_stream = motion_cmd_stream
+        self.motion_cmd_stream = streams[1]
         self.motion_feed_thread = Thread(
             target=self.__rob_feed_server,
             args=(self.motion_cmd_stream,),
@@ -35,8 +40,7 @@ class RobotConn:
         )
         self.motion_feed_thread.start()
 
-    @classmethod
-    def connect(cls):
+    def __connect(self, streams: list[socket.socket]):
         """
         Creates a connection to the robot.
         Port 29999 is the settings port used to enable or disable the arm
@@ -46,8 +50,8 @@ class RobotConn:
         """
         dashboard_conn = socket.create_connection(("192.168.1.6", 29999))
         motion_conn = socket.create_connection(("192.168.1.6", 30003))
-
-        return cls(dashboard_conn, motion_conn)
+        streams.append(dashboard_conn)
+        streams.append(motion_conn)
 
     def __rob_feed_server(self, conn):
         """

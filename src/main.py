@@ -101,7 +101,6 @@ def move_loop(robot):
             else:
                 x, y, z, r = coords
 
-            print(f"x: {x}, y: {y}, z: {z}, r: {r}")
             robot.mov_j(x, y, z, r)
             return (x, y, z, r)
 
@@ -144,7 +143,11 @@ def main():
     'move_loop' to activate multiple movements and feedback from the arm
     """
     args = parse_args()
-    robot = RobotConn.connect()
+    try:
+        robot = RobotConn()
+    except TimeoutError:
+        print("Connection Failed: TimeoutError")
+        return
 
     match args.command:
         case "on":
