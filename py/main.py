@@ -51,65 +51,84 @@ def move_loop(robot):
     If it get's less than that then it fills in with the previous coordinates given.
     Default coordinates are x: 270 and y, z and r: 0
     """
+
+    def match_s_ce_q(cmd):
+        """
+        :return tuple[matched, continue_loop]
+        """
+        match cmd:
+            case "q":
+                return (True, False)
+            case "s":
+                with robot.thread_lock:
+                    get_rob_status()
+                    return (True, True)
+            case "ce":
+                robot.clear_error()
+                return (True, True)
+
+        return (False, True)
+
+    def parse_coords(coords, x, y, z, r):
+
+        if "x" in coords:
+            coords[0] = x
+        if "y" in coords:
+            coords[1] = y
+        if "z" in coords:
+            coords[2] = z
+        if "r" in coords:
+            coords[3] = r
+
+        try:
+            coords = list(map(int, coords))
+
+            coord_num = len(coords)
+            if coord_num > 4:
+                coords = coords[0:4]
+                x, y, z, r = coords
+
+            elif coord_num < 4:
+                match coord_num:
+                    case 0:
+                        print("No coordinates, staying in place")
+                        return (x, y, z, r)
+                    case 1:
+                        x = coords[0]
+                    case 2:
+                        x, y = coords[0:2]
+                    case 3:
+                        x, y, z = coords[0:3]
+            else:
+                x, y, z, r = coords
+
+            # print(f"x: {x}, y: {y}, z: {z}, r: {r}")
+            robot.mov_j(x, y, z, r)
+            return (x, y, z, r)
+
+        except ValueError:
+            print(
+                "Only input numbers or the characters:\n'x', 'y', 'z', 'r', 's', 'ce', or 'q'"
+            )
+            return (x, y, z, r)
+
     robot.enable_robot()
     on = True
     x = 270
     y = z = r = 0
-    coords: list = [x, y, z, r]
     while on:
         sleep(0.1)
-        cmd = input(
-            "\nPlease input 'x y z r' coordinates\nor 's' for status\nor 'ce' to clear error\nor 'q' to quit\nCommand: "
-        ).lower()
-        print()
-        if cmd not in ("q", "s", "ce"):
-            coords = cmd.split()
-            if "x" in coords:
-                coords[0] = x
-            if "y" in coords:
-                coords[1] = y
-            if "z" in coords:
-                coords[2] = z
-            if "r" in coords:
-                coords[3] = r
+        with robot.thread_lock:
+            cmd = input(
+                "\nPlease input 'x y z r' coordinates\nor 's' for status\nor 'ce' to clear error\nor 'q' to quit\nCommand: "
+            ).lower()
+            print()
 
-            try:
-                coords = list(map(int, coords))
-
-                coord_num = len(coords)
-                if coord_num > 4:
-                    coords = coords[0:4]
-                    x, y, z, r = coords
-
-                elif coord_num < 4:
-                    match coord_num:
-                        case 0:
-                            print("No coordinates, staying in place")
-                            continue
-                        case 1:
-                            x = coords[0]
-                        case 2:
-                            x, y = coords[0:2]
-                        case 3:
-                            x, y, z = coords[0:3]
-                else:
-                    x, y, z, r = coords
-
-                print(f"x: {x}, y: {y}, z: {z}, r: {r}")
-                robot.mov_j(x, y, z, r)
-
-            except ValueError:
-                print(
-                    "Only input numbers or the characters:\n'x', 'y', 'z', 'r', 's', 'ce', or 'q'"
-                )
-
-        elif cmd == "s":
-            with robot.thread_lock:
-                get_rob_status()
-        elif cmd == "ce":
-            robot.clear_error()
-        elif cmd == "q":
+        matched, continue_loop = match_s_ce_q(cmd)
+        if not continue_loop:
             on = False
+        elif not matched:
+            parse_coords(cmd.split(), x, y, z, r)
 
     robot.disable_robot()
 
