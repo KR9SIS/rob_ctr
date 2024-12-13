@@ -89,7 +89,8 @@ class RobotConn:
         Function to clear an error and reset the robot.
         """
         self.dashboard_cmd_stream.sendall("ClearError()".encode())
-        self.dashboard_cmd_stream.sendall("Continue()".encode())
+        self.disable_robot()
+        self.enable_robot()
 
     def mov_j(self, x, y, z, r):
         """
