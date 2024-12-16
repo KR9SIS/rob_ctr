@@ -1,3 +1,8 @@
+"""
+module to move a dobot MG400
+import and run main after setting up connection to get started
+"""
+
 import argparse
 from time import sleep
 
@@ -27,10 +32,6 @@ def parse_args():
 
     subparsers.add_parser("status", help="Get robot status")
 
-    subparsers.add_parser("move_loop", help="Continously move the robot")
-
-    subparsers.add_parser("feed_loop", help="Continously get feedback from the robot")
-
     return parser.parse_args()
 
 
@@ -43,7 +44,7 @@ def get_rob_status():
     rfc.print_status(status)
 
 
-def move_loop(robot):
+def move_loop(robot, home):
     """
     GUI interface to repeatedly move the arm or access feedback from it.
     :params robot RobotConn
@@ -112,8 +113,16 @@ def move_loop(robot):
 
     robot.enable_robot()
     on = True
-    x = 270
-    y = z = r = 0
+    # Home position
+    x = 290
+    y = 0
+    z = 125
+    r = 0
+    if home:
+        sleep(0.1)
+        robot.mov_j(x, y, z, r)
+        with robot.thread_lock:
+            print("Moving MG400 to home position")
     while on:
         sleep(0.2)
         with robot.thread_lock:
@@ -162,7 +171,12 @@ def main():
             with robot.thread_lock:
                 get_rob_status()
         case "move_loop":
-            move_loop(robot)
+            if input(
+                "Move robot to default position (290, 0, 125, 0)?\nRespond with 'y' or 'yes'\n"
+            ).lower() in ("y", "yes"):
+                move_loop(robot, True)
+            else:
+                move_loop(robot, False)
 
 
 if __name__ == "__main__":

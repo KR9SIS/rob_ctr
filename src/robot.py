@@ -17,6 +17,7 @@ class RobotConn:
         self,
     ):
         self.thread_lock = Lock()
+
         streams = []
         connect_thread = Thread(target=self.__connect, args=(streams,), daemon=True)
         connect_thread.start()
