@@ -81,7 +81,7 @@ def move_loop(robot, home):
             coords[3] = r
 
         try:
-            coords = list(map(int, coords))
+            coords = list(map(float, coords))
 
             coord_num = len(coords)
             if coord_num > 4:
@@ -123,6 +123,7 @@ def move_loop(robot, home):
         robot.mov_j(x, y, z, r)
         with robot.thread_lock:
             print("Moving MG400 to home position")
+
     while on:
         sleep(0.2)
         with robot.thread_lock:
