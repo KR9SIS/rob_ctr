@@ -21,8 +21,9 @@ This is a script used to send commands to the DOBOT MG400. It can be run with or
 
 	***Error:*** `Command: 1000 -1000 -500 500`
 	Will throw a ControllerError, causing the robot to make beeping sound and stop execution. Arm range depends on it's joints but the best way to find your coordinates is to start at the home position (290 0 125 0) where all joints are 90˚ and move the arm in increments from there.
-![](/StudioPro/workspace1.png)
-![](/StudioPro/workspace2.png)
+
+    <img src="/StudioPro/workspace1.png" alt="X & Z axis robot workspace" style="width:40%; height:auto;">
+    <img src="/StudioPro/workspace2.png" alt="X & Y axis robot workspace" style="width:40%; height:auto;">
   - 'x', 'y', 'z', or 'r' as characters
     Uses previous value of 'x', 'y', 'z', or 'r'.
 	***Example with current coordinates 290, 20.5, 90.7 10:***
@@ -52,10 +53,11 @@ This is a script used to send commands to the DOBOT MG400. It can be run with or
   Sends a singular MovJ instruction to the arm.
   Requires that you input 4 numbers 'x', 'y', 'z' and 'r' with it. These numbers can either be floating point numbers or integers.
   ***Example:*** `python main.py move 290.0 0 125 0.0`
-	***Error:*** `Command: 1000 -1000 -500 500`
-	Will throw a ControllerError, causing the robot to make beeping sound and stop execution. Arm range depends on it's joints but the best way to find your coordinates is to start at the home position (290 0 125 0) where all joints are 90˚ and move the arm in increments from there.
-![](/StudioPro/workspace1.png)
-![](/StudioPro/workspace2.png)
+
+  ***Error:*** `Command: 1000 -1000 -500 500`
+  Will throw a ControllerError, causing the robot to make beeping sound and stop execution. Arm range depends on it's joints but the best way to find your coordinates is to start at the home position (290 0 125 0) where all joints are 90˚ and move the arm in increments from there.
+
+  <img src="/StudioPro/workspace1.png" alt="X & Z axis robot workspace" style="width:40%; height:auto;"> <img src="/StudioPro/workspace2.png" alt="X & Y axis robot workspace" style="width:40%; height:auto;">
 
 ---
 #### *do*
