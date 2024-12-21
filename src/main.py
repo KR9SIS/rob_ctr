@@ -40,7 +40,7 @@ def get_rob_status():
     rfc.print_status(status)
 
 
-def move_loop(robot, home):
+def move_loop(robot):
     """
     GUI interface to repeatedly move the arm or access feedback from it.
     :params robot RobotConn
@@ -48,23 +48,6 @@ def move_loop(robot, home):
     If it get's less than that then it fills in with the previous coordinates given.
     Default coordinates are x: 270 and y, z and r: 0
     """
-
-    def match_s_ce_q(cmd):
-        """
-        :return tuple[matched, continue_loop]
-        """
-        match cmd:
-            case "q":
-                return (True, False)
-            case "s":
-                with robot.thread_lock:
-                    get_rob_status()
-                    return (True, True)
-            case "ce":
-                robot.clear_error()
-                return (True, True)
-
-        return (False, True)
 
     def parse_coords(coords, x, y, z, r):
         if "x" in coords:
@@ -86,9 +69,6 @@ def move_loop(robot, home):
 
             elif coord_num < 4:
                 match coord_num:
-                    case 0:
-                        print("No coordinates, staying in place")
-                        return (x, y, z, r)
                     case 1:
                         x = coords[0]
                     case 2:
@@ -114,25 +94,34 @@ def move_loop(robot, home):
     y = 0
     z = 125
     r = 0
-    if home:
-        sleep(0.1)
-        robot.mov_j(x, y, z, r)
-        with robot.thread_lock:
-            print("Moving MG400 to home position")
 
     while on:
         sleep(0.2)
         with robot.thread_lock:
             cmd = input(
-                "\nPlease input 'x y z r' coordinates\nor 's' for status\nor 'ce' to clear error\nor 'q' to quit\nCommand: "
+                "\nPlease input 'x y z r' coordinates\nor 's' for status\nor 'ce' to clear error\nor 'home' for home position\nor 'q' to quit\nCommand: "
             ).lower()
             print()
 
-        matched, continue_loop = match_s_ce_q(cmd)
-        if not continue_loop:
-            on = False
-        elif not matched:
-            x, y, z, r = parse_coords(cmd.split(), x, y, z, r)
+        match cmd:
+            case "":
+                print("No coordinates, staying in place")
+
+            case "q":
+                on = False
+
+            case "s":
+                with robot.thread_lock:
+                    get_rob_status()
+
+            case "ce":
+                robot.clear_error()
+
+            case "home":
+                robot.mov_j(290, 0, 125, 0)
+
+            case _:
+                x, y, z, r = parse_coords(cmd.split(), x, y, z, r)
 
     robot.disable_robot()
 
@@ -166,12 +155,7 @@ def main():
             with robot.thread_lock:
                 get_rob_status()
         case "move_loop":
-            if input(
-                "Move robot to default position (290, 0, 125, 0)?\nRespond with 'y' or 'yes'\n"
-            ).lower() in ("y", "yes"):
-                move_loop(robot, True)
-            else:
-                move_loop(robot, False)
+            move_loop(robot)
 
 
 if __name__ == "__main__":
