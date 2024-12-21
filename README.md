@@ -22,6 +22,7 @@ If needed then you can stop the transmission by pressing `CTRL + c`
 ## Making the connection
 The robot accepts TCP/IP requests to talk to it.
 You can send them with for example Python using its socket module.
+
 ***Example codeblock:***
 ```
 import socket
