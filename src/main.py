@@ -26,15 +26,6 @@ def parse_args():
     move_parser.add_argument("z", type=float, help="Z coordinate")
     move_parser.add_argument("r", type=float, help="R coordinate")
 
-    do_parser = subparsers.add_parser("do", help="Set Digital Output")
-    do_parser.add_argument("index", type=int, help="Index")
-    do_parser.add_argument("status", type=int, help="Status")
-
-    di_parser = subparsers.add_parser("di", help="Get Digital Input")
-    di_parser.add_argument(
-        "--index", "-i", type=int, default=0, help="Get a Digital Input"
-    )
-
     subparsers.add_parser("status", help="Get robot status")
 
     return parser.parse_args()
@@ -171,10 +162,6 @@ def main():
             robot.disable_robot()
         case "move":
             robot.mov_j(args.x, args.y, args.z, args.r)
-        case "do":
-            robot.set_do(args.index, args.status)
-        case "di":
-            robot.get_di(args.index)
         case "status":
             with robot.thread_lock:
                 get_rob_status()

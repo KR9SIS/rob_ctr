@@ -83,28 +83,6 @@ class RobotConn:
         self.dashboard_cmd_stream.sendall(b"DisableRobot()\n")
         sleep(1)
 
-    def set_do(self, index, status):
-        """
-        Function calling port 29999 to change Digital Output stream
-        """
-        self.dashboard_cmd_stream.sendall(f"DO({index}, {status})\n".encode())
-
-    def get_di(self, index=0):
-        """
-        Function calling port 29999 to see Digital Input status
-        """
-        if 0 < index <= 16:
-            with self.thread_lock:
-                print("\nIndex: ", index)
-            self.dashboard_cmd_stream.sendall(f"DI({index})\n".encode())
-            sleep(1)
-        else:
-            for index in range(1, 17):
-                with self.thread_lock:
-                    print("\nIndex: ", index)
-                self.dashboard_cmd_stream.sendall(f"DI({index})\n".encode())
-                sleep(1)
-
     def clear_error(self):
         """
         Function to clear an error and reset the robot.
