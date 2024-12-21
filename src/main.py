@@ -6,7 +6,7 @@ import and run main after setting up connection to get started
 import argparse
 from time import sleep
 
-from robot import RobotConn, RobotStatusConn
+from robot import RobotConn
 
 
 def parse_args():
@@ -29,15 +29,6 @@ def parse_args():
     subparsers.add_parser("status", help="Get robot status")
 
     return parser.parse_args()
-
-
-def get_rob_status():
-    """
-    Gets feedback from MG400 off port 30004 and prints it to std out.
-    """
-    rfc = RobotStatusConn.connect()
-    status = rfc.receive_rob_status()
-    rfc.print_status(status)
 
 
 def move_loop(robot):
@@ -112,7 +103,7 @@ def move_loop(robot):
 
             case "s":
                 with robot.thread_lock:
-                    get_rob_status()
+                    robot.get_rob_status()
 
             case "ce":
                 robot.clear_error()
@@ -123,6 +114,7 @@ def move_loop(robot):
             case _:
                 x, y, z, r = parse_coords(cmd.split(), x, y, z, r)
 
+    robot.mov_j(290, 0, 125, 0)
     robot.disable_robot()
 
 
@@ -153,7 +145,7 @@ def main():
             robot.mov_j(args.x, args.y, args.z, args.r)
         case "status":
             with robot.thread_lock:
-                get_rob_status()
+                robot.get_rob_status()
         case "move_loop":
             move_loop(robot)
 

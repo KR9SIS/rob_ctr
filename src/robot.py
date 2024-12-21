@@ -95,33 +95,13 @@ class RobotConn:
         """
         self.motion_cmd_stream.sendall(f"MovJ({x}, {y}, {z}, {r})\n".encode())
 
-
-class RobotStatusConn:
-    """
-    Class to return the current status of the robot
-    """
-
-    def __init__(self, status_conn):
-        self.status_conn = status_conn
-
-    @classmethod
-    def connect(cls):
+    def get_rob_status(self):
         """
-        Create connection to port 30004
+        Connects to port 30004 and gets the current status of MG400
         """
-        feedback_conn = socket.create_connection(("192.168.1.6", 30004))
-        return cls(feedback_conn)
-
-    def receive_rob_status(self):
-        """
-        Use RobStatusData type to map robot status to stdout
-        """
-        buffer = self.status_conn.recv(1440)
-        return frombuffer(buffer, dtype=RobStatusData)[0]
-
-    def print_status(self, status):
-        """
-        Print out all data from Robot Status with its header
-        """
+        status = frombuffer(
+            socket.create_connection(("192.168.1.6", 30004)).recv(1440),
+            dtype=RobStatusData,
+        )
         print("Arm Coordinates", status[31][0:4])
         _ = [print(header, data) for header, data in zip(status_data_arr, status)]
