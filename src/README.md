@@ -26,7 +26,7 @@ This is a script used to send commands to the DOBOT MG400. It can be run with or
     <img src="/StudioPro/workspace2.png" alt="X & Y axis robot workspace" style="width:40%; height:auto;">
   - 'x', 'y', 'z', or 'r' as characters
     Uses previous value of 'x', 'y', 'z', or 'r'.
-	***Example with current coordinates 290, 20.5, 90.7 10:***
+	***Example with current coordinates 290, 20.5, 90.7, 10:***
 	   `Command: x y 155.5 r`
 	   Will call `MovJ(290, 20.5, 155.5, 10)`.
   - 's'
@@ -35,8 +35,11 @@ This is a script used to send commands to the DOBOT MG400. It can be run with or
   - 'ce'
     Clears any errors currently being thrown by the robot arm, resets it and readies it for further use.
 		***Example:*** `Command: ce`
+  - 'home'
+	Moves the arm back to the home position 290 0 125 0 where all joints are at a 90°angle.
+		***Example:*** `Command: home`
   - 'q'
-    Exits the loop, disables the arm and exits the program.
+    Exits the loop, moves the arm back to home position, disables the arm and exits the program.
 		***Example:*** `Command: q`
 ---
 #### *on*
@@ -60,20 +63,14 @@ This is a script used to send commands to the DOBOT MG400. It can be run with or
   <img src="/StudioPro/workspace1.png" alt="X & Z axis robot workspace" style="width:40%; height:auto;"> <img src="/StudioPro/workspace2.png" alt="X & Y axis robot workspace" style="width:40%; height:auto;">
 
 ---
-#### *do*
-Changes the digital output settings of the robot. Takes in index and status.
-    ***Examples:***
-	`python main.py do int index bool status`
-	`python main.py do 10 0`
-	`python main.py do 10 1`
-
----
 #### *status*
   Prints out the current status of the arm.
     ***Example:*** `python main.py status`
 
 ---
 ## robot
+This file is a class definition for RobotConn and its methods. Raises TimeoutError if connection cannot be made to MG400.
 
 ## rob_status
+This file is a definition for a numpy datatype mapping the status bytes given by the robot to their respective values.
 
