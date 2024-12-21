@@ -43,16 +43,14 @@ class RobotConn:
 
     def __connect(self, streams: list[socket.socket]):
         """
-        Creates a connection to the robot.
+        Creates a connection to the robot by populating a list which can be indexed by __init__.
         Port 29999 is the settings port used to enable or disable the arm
         Port 30003 is the movement port used to send movement instructions to the arm
 
-        :return RobotConn object with active connection to the two ports
+        params: empty list to be populated with socket connection references
         """
-        dashboard_conn = socket.create_connection(("192.168.1.6", 29999))
-        motion_conn = socket.create_connection(("192.168.1.6", 30003))
-        streams.append(dashboard_conn)
-        streams.append(motion_conn)
+        streams.append(socket.create_connection(("192.168.1.6", 29999)))  # Dashboard
+        streams.append(socket.create_connection(("192.168.1.6", 30003)))  # Motion
 
     def __rob_feed_server(self, conn):
         """
@@ -71,21 +69,21 @@ class RobotConn:
 
     def enable_robot(self):
         """
-        Function calling port 29999 to enable robot
+        Calls port 29999 to enable robot
         """
         self.dashboard_cmd_stream.sendall(b"EnableRobot()\n")
         sleep(1)
 
     def disable_robot(self):
         """
-        Function calling port 29999 to disable robot
+        Calls port 29999 to disable robot
         """
         self.dashboard_cmd_stream.sendall(b"DisableRobot()\n")
         sleep(1)
 
     def clear_error(self):
         """
-        Function to clear an error and reset the robot.
+        Calls port 29999 to clear an error and reset the robot.
         """
         self.dashboard_cmd_stream.sendall("ClearError()".encode())
         self.disable_robot()
@@ -93,7 +91,7 @@ class RobotConn:
 
     def mov_j(self, x, y, z, r):
         """
-        Function calling port 30003
+        Calls port 30003, moving the robot arm to given coordinates
         """
         self.motion_cmd_stream.sendall(f"MovJ({x}, {y}, {z}, {r})\n".encode())
 
