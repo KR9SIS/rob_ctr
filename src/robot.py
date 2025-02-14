@@ -103,5 +103,5 @@ class RobotConn:
             socket.create_connection(("192.168.1.6", 30004)).recv(1440),
             dtype=RobStatusData,
         )
-        print("Arm Coordinates", status[31][0:4])
+        print("Arm Coordinates", status[0][31][0:4])
         _ = [print(header, data) for header, data in zip(status_data_arr, status)]
